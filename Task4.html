@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grayscale Image Converter</title>
+    <!-- Bootstrap CSS Link -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-KyZXEJt1h0yQ4n7xDk3p5r5Fwp8g6jElA6QJx1JbxV0o68Nxw6N1m9aPbbSdoYX5" crossorigin="anonymous">
+    <style>
+        body {
+            background-color: #f7f7f7;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            max-width: 1000px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 40px;
+            width: 100%;
+        }
+        .canvas-container {
+            display: flex;
+            justify-content: space-between;
+            text-align: center;
+            margin-top: 20px;
+        }
+        canvas {
+            max-width: 48%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            font-family: 'Arial', sans-serif;
+            color: #333;
+        }
+        .btn-upload {
+            background-color: #007bff;
+            color: white;
+            border-radius: 5px;
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+        .btn-upload:hover {
+            background-color: #0056b3;
+        }
+        .title{
+            display: flex;
+            justify-content:space-evenly ;
+            margin-top: 20px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #333;
+            align-items: center;
+        }
+    </style>
+    
+</head>
+<body>
+    <a href="file:///C:/Users/user/OneDrive/Ishchi%20stol/Cowork/IT/Virtual%20filio/html/index.html#portfolio" style="position: absolute; top: 10px; left: 10px;">
+        <img src="left-arrow.png" alt="Back" style="width:50px; height:50px;">
+    </a>
+    
+    <div class="container">
+        <h1 class="text-center">Image Processing</h1>
+        <div class="text-center">
+            <input type="file" id="imageInput" class="form-control my-4" accept="image/*">
+            <button class="btn-upload btn btn-primary" onclick="resetCanvas()">Removed</button>
+        </div>
+        <div class="title">
+            <h3>Original</h3>
+            <h3>Changed</h3>
+        </div>
+        <div class="canvas-container">
+            <canvas id="originalCanvas"></canvas>
+            <canvas id="grayscaleCanvas"></canvas>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS, Popper.js -->
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js" integrity="sha384-oBqDVmMz4fnFO9gyb33U8dQ0aGh19ViVY0p3pG8VfPpx3r9xxBzO9F+Mj7vzzf7j3" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.min.js" integrity="sha384-pzjw8f+ua7Kw1TIq0F1a0tqpSlf3mFty6b1QJr59CdzKv59y7KqD6kfhE9dDjpdt" crossorigin="anonymous"></script>
+
+    <script>
+        const imageInput = document.getElementById('imageInput');
+        const originalCanvas = document.getElementById('originalCanvas');
+        const grayscaleCanvas = document.getElementById('grayscaleCanvas');
+        const originalCtx = originalCanvas.getContext('2d');
+        const grayscaleCtx = grayscaleCanvas.getContext('2d');
+
+        imageInput.addEventListener('change', () => {
+            const file = imageInput.files[0];
+            if (file) {
+                const img = new Image();
+                img.onload = () => {
+                    // Original rasmni o'rtada ko'rsatish
+                    originalCanvas.width = img.width;
+                    originalCanvas.height = img.height;
+                    originalCtx.drawImage(img, 0, 0);
+
+                    // Grayscale rasmni o'ng tomonda ko'rsatish
+                    grayscaleCanvas.width = img.width;
+                    grayscaleCanvas.height = img.height;
+                    grayscaleCtx.drawImage(img, 0, 0);
+
+                    // Tasvir piksel ma'lumotlarini olish (Grayscale uchun)
+                    const imageData = grayscaleCtx.getImageData(0, 0, img.width, img.height);
+                    const data = imageData.data;
+
+                    // Har bir pikselni oq-qora formatga aylantirish
+                    for (let i = 0; i < data.length; i += 4) {
+                        const red = data[i];
+                        const green = data[i + 1];
+                        const blue = data[i + 2];
+                        const avg = (red + green + blue) / 3;
+
+                        data[i] = avg;       // Red
+                        data[i + 1] = avg;   // Green
+                        data[i + 2] = avg;   // Blue
+                        // Alpha (data[i + 3]) saqlanib qoladi
+                    }
+
+                    // Yangilangan piksel ma'lumotlarini kanvaska chizish (Grayscale)
+                    grayscaleCtx.putImageData(imageData, 0, 0);
+                };
+
+                // Tanlangan tasvirni yuklash
+                img.src = URL.createObjectURL(file);
+            }
+        });
+
+        // Reset Canvas function
+        function resetCanvas() {
+            originalCtx.clearRect(0, 0, originalCanvas.width, originalCanvas.height);
+            grayscaleCtx.clearRect(0, 0, grayscaleCanvas.width, grayscaleCanvas.height);
+            imageInput.value = ""; // Faylni tozalash
+        }
+    </script>
+</body>
+</html>
